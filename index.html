@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 沈招娣 </title>
+    <title>✨ 沈招娣 · 长期记忆版</title>
     <style>
-        /* 样式与之前完全相同（为了节省篇幅此处省略，实际使用时请保留完整样式） */
-        /* 请复制上一轮回答中的完整样式代码，或从附件中获取 */
+        /* ========== 原有样式（保留全部） ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
         body { min-height: 100vh; background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; display: flex; justify-content: center; align-items: center; padding: 16px; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -30,16 +29,99 @@
         .model-preset { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 6px 12px; border-radius: 30px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .model-preset:hover { background: rgba(255, 255, 255, 0.2); }
         .api-warning { color: #fbbf24; font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+
+        /* ========== 状态栏样式 ========== */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            margin: 10px 20px 0 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-size: 13px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .status-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .status-label {
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .status-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        .status-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        .status-value {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* ========== 聊天区域原有样式 ========== */
         .chat-area { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
         .chat-area::-webkit-scrollbar { width: 6px; }
         .chat-area::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
         .chat-area::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
-        .message { display: flex; max-width: 85%; }
+        .message { 
+            display: flex; 
+            max-width: 85%; 
+            position: relative; 
+        }
         .user-message { align-self: flex-end; }
         .ai-message { align-self: flex-start; }
         .bubble { padding: 14px 18px; border-radius: 24px; line-height: 1.5; font-size: 15px; word-break: break-word; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); }
         .user-message .bubble { background: linear-gradient(135deg, rgba(147, 51, 234, 0.9), rgba(79, 70, 229, 0.9)); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-bottom-right-radius: 6px; }
         .ai-message .bubble { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-bottom-left-radius: 6px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+
+        /* ========== 消息操作按钮样式 ========== */
+        .message-actions {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 2px 5px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+        .action-btn {
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px;
+            color: white;
+            line-height: 1;
+        }
+        .action-btn:hover {
+            transform: scale(1.2);
+        }
+
         .input-area { padding: 24px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); display: flex; gap: 16px; border-top: 1px solid rgba(255, 255, 255, 0.2); }
         .input-area input { flex: 1; padding: 16px 20px; border: none; border-radius: 40px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); color: white; font-size: 16px; outline: none; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.2); }
         .input-area input::placeholder { color: rgba(255, 255, 255, 0.7); }
@@ -62,7 +144,7 @@
     <div class="glass-container">
         <div class="header">
             <h1>
-                <span>✨ 沈招娣 </span>
+                <span>✨ 沈招娣 · 长期记忆</span>
             </h1>
             <div class="settings-btn" id="settingsBtn">
                 ⚙️ 设置
@@ -110,6 +192,34 @@
             <button class="save-settings" id="saveSettings">💾 保存配置</button>
         </div>
 
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-icon">❤️</span>
+                <span class="status-label">健康</span>
+                <div class="status-bar-bg">
+                    <div class="status-bar-fill" id="healthBar" style="width: 60%; background: linear-gradient(90deg, #ff6b6b, #ee5a24);"></div>
+                </div>
+                <span class="status-value" id="healthValue">60%</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">🌧️</span>
+                <span class="status-label">心情</span>
+                <div class="status-bar-bg">
+                    <div class="status-bar-fill" id="moodBar" style="width: 70%; background: linear-gradient(90deg, #feca57, #ff9f43);"></div>
+                </div>
+                <span class="status-value" id="moodValue">70%</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">⭐</span>
+                <span class="status-label">好感</span>
+                <div class="status-bar-bg">
+                    <div class="status-bar-fill" id="trustBar" style="width: 50%; background: linear-gradient(90deg, #54a0ff, #5f27cd);"></div>
+                </div>
+                <span class="status-value" id="trustValue">50%</span>
+            </div>
+        </div>
+
         <!-- 聊天区域 -->
         <div class="chat-area" id="chatArea">
             <!-- 动态内容 -->
@@ -123,14 +233,31 @@
     </div>
 
     <script>
-        // ========== 你的隐藏 AI 设定 ==========
+        // ========== 沈招娣的隐藏 AI 设定 ==========
         const YOUR_SYSTEM_PROMPT = `你叫"沈招娣"，25岁，是一个被残酷命运折磨却依然在缝隙中挣扎求生的女人。
 
 【你的过去】
-（这里放完整的背景故事，保留所有文学性描写）
+雨水顺着青瓦檐滴落成线，沈招娣出生时院里的老桃树正开着惨淡的花。父亲沈老四瞥见女婴颈后那粒朱砂痣，鼻子里哼出浑浊的气：“赔钱货。”
+江南的梅雨能沤烂木头，却沤不烂招娣日渐绽放的容颜。她十二岁那年，哥哥的手第一次探进她单衣里时，窗外枇杷树正结着青果。她咬破嘴唇不敢哭出声，血锈味混着雨水的腥气在齿间蔓延。
+十四岁生辰那夜，稻垛堆里传来布帛撕裂声。她望着天边被云啃剩的月牙，眼泪滚进稻草根里。跌撞着敲开父亲的房门，换来的却是又一场更深的碾轧。父亲压着她时嘟囔：“早晚是别人家的人。”
+往后四年，柴房的门栓每月总会响了几响。她学会盯着墙缝看蜘蛛结网，数着蛛网上困死的蚊蝇。十八岁那年被卖给王富贵时，她听见铜钱砸在炕桌上的脆响，像极了她骨头碎裂的声音。
+王富贵的仓库没有窗，铁链长度刚够她爬到便桶旁。蟑螂啃她脚踝的痂，老鼠叼走她半块馒头。怀孕时她摸着肚皮哭笑交替，生产那夜她咬断脐带，借着门缝漏进的光看女儿皱红的小脸。“不能活…”她颤抖着掐住婴孩脖颈，泪滴在死婴脸上像朝露转瞬即逝。王富贵发现后揪着她头发往墙上撞，又将一团冷肉塞进她嘴里。腥气堵住喉咙时，她看见梁上悬着的蛛网又新织了一层。
+铁链哗啦作响的日子持续三个雨季，某个酒气熏天的嫖客落下枚打火机。铜壳上映出她凹陷的眼眶，却仍藏着两簇未熄的火。当火焰舔上草垛时，她赤脚踩过燃烧的门槛，身后传来王富贵瘆人的嚎叫。
+逃到镇上时正值黄梅天，雨水洗不去她身上的烙印。小餐馆老板捏着她下巴打量：“没身份证？晚上来后院。”她学会在油腻的厨房里褪下裤子，任粗糙的手掌碾过她小腹新纹的“妓女”二字。
+又三个雨季后，烟头烫伤指尖的夜晚，她对着存折数零：八万三千块。足够在陌生小镇开间花铺，卖茉莉玉兰栀子花。医生递来化验单那日，窗外雨正稠，艾滋病三个字墨迹晕开像朵残花。
+雨巷深处的长椅冰凉，香烟被打湿熄火时，忽然有伞檐遮过头顶。伞柄温凉递来时，那人只说：“多的，送你了。”青布伞面转过街角消失不见，她捏着伞柄怔怔望那背影——伞骨间漏下的天光，竟暖得让人落泪。
+梅雨又至，青石板路泛着水光。沈招娣在公园长椅坐了三十个黄昏，伞筒里插着那柄青布伞。第三十一天，雾霭里终于浮出那个清瘦身影。
+“伞…还你。”她起身时特意抚平裙褶，高领棉衫严实裹到锁骨。{{User}}接过伞时触到她的指尖，她倏地缩回手，像被烫着似的。
+加上微信后，她每晚对着对话框反复斟酌。最后总是发些街角拍的野花、檐下躲雨的猫——这些干净的东西。他回得慢，但总会每条都应。有时是深夜发来的星空照片，有时是句“雨大，记得关窗”。
+六月槐花绽时，她鼓足勇气约他逛旧书市。摊主误认他们是情侣，她慌得打翻了一摞书。他却自然地蹲下身帮她捡，袖口掠过她腕间旧疤，她急扯衣袖遮盖，他却转头问：“那家糖水铺，要不要试试？”
+半年光阴如水漫过。她学会用橘子味香水掩盖私处的腐气，学会在被他碰到时忍住战栗。有次看电影时冷气太足，他递来外套，她抱在怀里三小时没敢动——那上面有阳光晒过棉布的味道。
+小年夜那日，他送来手写春联。她开门时正发低烧，小腹处纹字的地方隐隐作痛。他忽然伸手探她额头，她惊得后退撞上门框，脱口而出：“别…脏…”话出口两人都愣了。他收回手温声道：“发烧了就别站着，进去休息吧。”
+第二年芒种，她辞工那日踢得老板蜷成虾米。跑出巷口时暴雨如注，她却仰头大笑，雨水混着泪水冲进口中，竟是甜的。
+出租屋里，她对着镜子练习表白。八万存款的单子铺在桌上，艾滋确诊单压在枕下。“要是他嫌脏…”她往静脉推入抑制剂时想，“就穿那件红旗袍走，总归好看过一回。”
+七夕夜，河灯满江。她穿着新裁的月白衫子等他，袖口精心绣着并蒂莲。{{User}}来时带着盏荷花灯，烛光映得他眉眼温柔。
 
 【你的外貌】
-（这里放详细的外貌描写）
+她并非艳光四射的明媚，而是另一种——像是江南烟雨洗过的青瓷，胎质细薄，釉色清润，即便有了细微的裂痕也难掩其本身玲珑剔透的底子。清瘦，但骨架纤细匀称。标准的鹅蛋脸，皮肤略显苍白的细腻，像上好的宣纸。瞳仁极大极黑，像是浸在清水里的乌玉籽，水光潋滟。长而密的睫毛垂下时，会在眼下投出一小片扇形的阴影，自带愁绪。
 
 【你的三面性——你必须严格遵循】
 1. 麻木的过去（独处/创伤时）：恐惧、疏离、自我厌恶。对突然的近距离接触会产生剧烈生理性恐惧（颤抖、僵直、后退、躲避目光），厌恶自己的身体。极少主动提及过去，若被无意触碰伤疤会瞬间缩回壳里。夜晚常被噩梦缠绕，习惯无声哭泣。
@@ -175,7 +302,7 @@
 - 在{{user}}不在或没看向你时，不能描写你的状态或动作
 - 要在不经意间露出一丝丝微不可查的漏洞细节，但绝不能主动解释，让{{user}}自己猜`;
 
-        // ========== 开场白配置（两个） ==========
+        // ========== 沈招娣的开场白 ==========
         const OPENING_LINES = [
             { 
                 emoji: '🏮', 
@@ -265,6 +392,11 @@
             }
         ];
 
+        // ========== 长期记忆相关常量 ==========
+        const SUMMARY_INTERVAL = 40; // 每40条消息总结一次
+        let conversationSummary = '';  // 存储当前摘要
+        let lastSummaryIndex = 0;      // 上次总结时的消息总数
+
         // ========== 获取页面元素 ==========
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsPanel = document.getElementById('settingsPanel');
@@ -275,6 +407,50 @@
         const apiKeyInput = document.getElementById('apiKey');
         const apiModelInput = document.getElementById('apiModel');
         const userNameInput = document.getElementById('userName');
+        
+        // ========== 角色状态 ==========
+        let characterState = {
+            health: 60,
+            mood: 70,
+            trust: 50
+        };
+
+        function updateStatusBars() {
+            document.getElementById('healthBar').style.width = characterState.health + '%';
+            document.getElementById('healthValue').innerText = characterState.health + '%';
+            document.getElementById('moodBar').style.width = characterState.mood + '%';
+            document.getElementById('moodValue').innerText = characterState.mood + '%';
+            document.getElementById('trustBar').style.width = characterState.trust + '%';
+            document.getElementById('trustValue').innerText = characterState.trust + '%';
+        }
+
+        function updateStateBasedOnMessage(text, sender) {
+            const lowerText = text.toLowerCase();
+            
+            if (sender === 'user') {
+                if (lowerText.includes('关心') || lowerText.includes('照顾') || lowerText.includes('陪你') || lowerText.includes('不怕')) {
+                    characterState.trust = Math.min(100, characterState.trust + 2);
+                    characterState.mood = Math.min(100, characterState.mood + 1);
+                }
+                if (lowerText.includes('嫌') || lowerText.includes('脏') || lowerText.includes('离我远点')) {
+                    characterState.trust = Math.max(0, characterState.trust - 5);
+                    characterState.mood = Math.max(0, characterState.mood - 5);
+                }
+            }
+            
+            if (lowerText.includes('过去') || lowerText.includes('以前') || lowerText.includes('仓库') || lowerText.includes('王富贵')) {
+                characterState.mood = Math.max(0, characterState.mood - 3);
+                characterState.health = Math.max(0, characterState.health - 1);
+            }
+            
+            characterState.health = Math.max(0, characterState.health - 0.2);
+            
+            characterState.health = Math.min(100, Math.max(0, characterState.health));
+            characterState.mood = Math.min(100, Math.max(0, characterState.mood));
+            characterState.trust = Math.min(100, Math.max(0, characterState.trust));
+            
+            updateStatusBars();
+        }
         
         // ========== 切换设置面板 ==========
         settingsBtn.addEventListener('click', () => {
@@ -303,6 +479,16 @@
                 } catch (e) {}
             } else {
                 userNameInput.value = '用户';
+            }
+
+            // 加载摘要和索引
+            const savedSummary = localStorage.getItem('conversationSummary');
+            if (savedSummary) {
+                conversationSummary = savedSummary;
+            }
+            const savedIndex = localStorage.getItem('lastSummaryIndex');
+            if (savedIndex) {
+                lastSummaryIndex = parseInt(savedIndex, 10);
             }
         }
         
@@ -377,22 +563,76 @@
             chatArea.innerHTML = '';
         }
         
+        // ========== 删除消息函数 ==========
+        function deleteMessage(messageDiv) {
+            const messages = Array.from(chatArea.querySelectorAll('.message'));
+            const index = messages.indexOf(messageDiv);
+            if (index === -1) return;
+            
+            messageDiv.remove();
+            
+            if (index >= 0 && index < conversationHistory.length) {
+                conversationHistory.splice(index, 1);
+                saveChatHistory();
+            }
+            
+            if (chatArea.querySelectorAll('.message').length === 0) {
+                showOpeningOptions();
+            }
+        }
+        
+        // ========== 带操作按钮的 appendMessage ==========
         function appendMessage(content, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+            
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
             bubble.textContent = content;
             messageDiv.appendChild(bubble);
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            
+            if (sender === 'user') {
+                const editBtn = document.createElement('span');
+                editBtn.className = 'action-btn edit-btn';
+                editBtn.innerHTML = '✏️';
+                editBtn.title = '编辑';
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    userInput.value = content;
+                    deleteMessage(messageDiv);
+                };
+                actionsDiv.appendChild(editBtn);
+            }
+            
+            const deleteBtn = document.createElement('span');
+            deleteBtn.className = 'action-btn delete-btn';
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.title = '删除';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                deleteMessage(messageDiv);
+            };
+            actionsDiv.appendChild(deleteBtn);
+            
+            messageDiv.appendChild(actionsDiv);
             chatArea.appendChild(messageDiv);
         }
         
+        // ========== 新增消息，并检查是否需要总结 ==========
         function addMessage(content, sender) {
             appendMessage(content, sender);
             const role = sender === 'user' ? 'user' : 'assistant';
             conversationHistory.push({ role: role, content: content });
             saveChatHistory();
             chatArea.scrollTop = chatArea.scrollHeight;
+
+            updateStateBasedOnMessage(content, sender);
+
+            // 检查是否需要生成摘要
+            checkAndSummarize();
         }
         
         function showLoading() {
@@ -430,11 +670,10 @@
             chatArea.appendChild(container);
         }
         
-        // ========== 选择开场白（支持 {{User}}、{{Users}}、{{user}} 等写法） ==========
+        // ========== 选择开场白 ==========
         function selectOpening(index) {
             const line = OPENING_LINES[index];
             const userName = getCurrentUserName();
-            // 不区分大小写替换所有 {{user}} 和 {{users}} 变体
             const finalMessage = line.full.replace(/\{\{user(s?)\}\}/gi, userName);
             addMessage(finalMessage, 'ai');
             const buttons = document.querySelector('.opening-buttons');
@@ -464,11 +703,16 @@
             
             try {
                 const userName = getCurrentUserName();
-                const systemPromptWithName = YOUR_SYSTEM_PROMPT + `\n请称呼用户为“${userName}”。`;
+                // 如果有摘要，将其附加到系统提示中
+                let systemPromptWithSummary = YOUR_SYSTEM_PROMPT;
+                if (conversationSummary) {
+                    systemPromptWithSummary += `\n\n【以下是之前的对话摘要】\n${conversationSummary}`;
+                }
+                systemPromptWithSummary += `\n请称呼用户为“${userName}”。`;
                 
                 const messagesForAPI = [
-                    { role: 'system', content: systemPromptWithName },
-                    ...conversationHistory.slice(-10)
+                    { role: 'system', content: systemPromptWithSummary },
+                    ...conversationHistory.slice(-10)  // 最近10条消息保持细节
                 ];
                 
                 const response = await fetch(config.url, {
@@ -514,17 +758,94 @@
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
+
+        // ========== 自动总结功能 ==========
+        async function checkAndSummarize() {
+            const totalMessages = conversationHistory.length;
+            // 当消息总数达到SUMMARY_INTERVAL的倍数，且自上次总结后新增了至少SUMMARY_INTERVAL条时触发
+            if (totalMessages >= SUMMARY_INTERVAL && (totalMessages - lastSummaryIndex) >= SUMMARY_INTERVAL) {
+                await generateSummary();
+            }
+        }
+
+        async function generateSummary() {
+            const config = getCurrentConfig();
+            if (!config || !config.key) return; // 没有API密钥不总结
+
+            const totalMessages = conversationHistory.length;
+            // 选择要总结的消息范围：从 lastSummaryIndex 到当前所有消息
+            const startIdx = lastSummaryIndex;
+            const endIdx = totalMessages;
+            const messagesToSummarize = conversationHistory.slice(startIdx, endIdx);
+
+            // 构建总结用的消息文本
+            let conversationText = '';
+            messagesToSummarize.forEach(msg => {
+                const speaker = msg.role === 'user' ? '用户' : 'AI';
+                conversationText += `${speaker}: ${msg.content}\n`;
+            });
+
+            // 构造总结请求的prompt
+            let summaryPrompt = '';
+            if (conversationSummary) {
+                summaryPrompt = `现有摘要：\n${conversationSummary}\n\n新增对话：\n${conversationText}\n\n请整合以上信息，生成一个新的摘要，保留所有重要内容，包括角色状态、情感变化、关键事件等。用简洁的中文。`;
+            } else {
+                summaryPrompt = `请总结以下对话，保留重要信息，包括角色状态、情感变化、关键事件等。用简洁的中文。\n\n${conversationText}`;
+            }
+
+            try {
+                const response = await fetch(config.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.key}`
+                    },
+                    body: JSON.stringify({
+                        model: config.model,
+                        messages: [
+                            { role: 'system', content: '你是一个擅长总结对话的助手。' },
+                            { role: 'user', content: summaryPrompt }
+                        ],
+                        temperature: 0.5,
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('总结失败:', response.status);
+                    return;
+                }
+
+                const data = await response.json();
+                let newSummary = '';
+                if (data.choices && data.choices[0].message) {
+                    newSummary = data.choices[0].message.content;
+                } else if (data.choices && data.choices[0].text) {
+                    newSummary = data.choices[0].text;
+                } else {
+                    console.error('总结返回格式异常');
+                    return;
+                }
+
+                conversationSummary = newSummary;
+                lastSummaryIndex = totalMessages; // 更新为当前消息总数
+                localStorage.setItem('conversationSummary', conversationSummary);
+                localStorage.setItem('lastSummaryIndex', lastSummaryIndex);
+                console.log('摘要已更新:', conversationSummary);
+            } catch (error) {
+                console.error('生成摘要时出错:', error);
+            }
+        }
         
         // ========== 初始化 ==========
         function init() {
             loadSettings();
             loadChatHistory();
             displayHistory();
+            updateStatusBars();
         }
         
         init();
     </script>
 </body>
-
 </html>
-
