@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 沈招娣 · 长期记忆 · 模型切换版</title>
+    <title>✨ 沈招娣 · 长期记忆版</title>
     <style>
         /* ========== 原有样式（保留全部） ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
@@ -23,17 +23,14 @@
         .setting-item input, .setting-item select { padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.1); color: white; font-size: 14px; outline: none; }
         .setting-item input:focus, .setting-item select:focus { border-color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.15); }
         .setting-item input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .save-settings, .test-connection-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; color: white; padding: 12px; border-radius: 40px; cursor: pointer; font-weight: 600; margin-top: 8px; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .test-connection-btn { background: linear-gradient(135deg, #10b981, #059669); margin-top: 0; }
-        .save-settings:hover, .test-connection-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
-        .test-connection-btn:hover { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .save-settings { background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; color: white; padding: 12px; border-radius: 40px; cursor: pointer; font-weight: 600; margin-top: 8px; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .save-settings:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
         .preset-models { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
         .model-preset { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 6px 12px; border-radius: 30px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .model-preset:hover { background: rgba(255, 255, 255, 0.2); }
         .api-warning { color: #fbbf24; font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
-        .conn-result { font-size: 13px; padding: 8px 12px; border-radius: 20px; background: rgba(0,0,0,0.3); color: #ccc; margin-top: 8px; text-align: center; }
 
-        /* ========== 状态栏样式（增加模型显示） ========== */
+        /* ========== 状态栏样式 ========== */
         .status-bar {
             display: flex;
             justify-content: space-between;
@@ -78,24 +75,6 @@
         .status-value {
             font-size: 11px;
             opacity: 0.8;
-        }
-        /* 模型显示专属样式 */
-        .model-display {
-            font-size: 14px;
-            font-weight: bold;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 12px;
-            border-radius: 40px;
-            margin-top: 4px;
-            cursor: pointer;
-            transition: 0.2s;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .model-display:hover {
-            background: rgba(255,255,255,0.35);
         }
 
         /* ========== 聊天区域原有样式 ========== */
@@ -172,7 +151,7 @@
             </div>
         </div>
         
-        <!-- 设置面板（增强：测试连接按钮） -->
+        <!-- 设置面板（增加模型获取功能） -->
         <div class="settings-panel" id="settingsPanel">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: white;">🔧 配置</h3>
@@ -205,20 +184,26 @@
                 <div class="api-warning">⚠️ 密钥只存在你的浏览器</div>
             </div>
             
+            <!-- 模型名称行 + 获取模型按钮 -->
             <div class="setting-item">
                 <label>🤖 模型名称</label>
-                <input type="text" id="apiModel" placeholder="deepseek-chat">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="apiModel" placeholder="deepseek-chat" style="flex: 1;">
+                    <button id="fetchModelsBtn" class="model-preset" style="white-space: nowrap; padding: 10px 16px;" title="从当前API获取模型列表">🔄 获取模型</button>
+                </div>
+                <!-- 下拉选择容器 (初始隐藏) -->
+                <div id="modelSelectContainer" style="margin-top: 8px; display: none;">
+                    <select id="modelSelect" style="width: 100%; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                        <option value="">⏳ 加载模型中…</option>
+                    </select>
+                    <div id="modelFetchError" style="color: #f87171; font-size: 12px; margin-top: 4px;"></div>
+                </div>
             </div>
             
-            <!-- 新增：测试连接按钮 + 显示结果区域 -->
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <button class="test-connection-btn" id="testConnectionBtn">🔌 测试连接</button>
-                <button class="save-settings" id="saveSettings">💾 保存配置</button>
-            </div>
-            <div id="connectionResult" class="conn-result">⚡ 点击测试连接验证API</div>
+            <button class="save-settings" id="saveSettings">💾 保存配置</button>
         </div>
 
-        <!-- 状态栏（新增模型显示项） -->
+        <!-- 状态栏（好感初始70%） -->
         <div class="status-bar">
             <div class="status-item">
                 <span class="status-icon">❤️</span>
@@ -240,15 +225,10 @@
                 <span class="status-icon">⭐</span>
                 <span class="status-label">好感</span>
                 <div class="status-bar-bg">
-                    <div class="status-bar-fill" id="trustBar" style="width: 50%; background: linear-gradient(90deg, #54a0ff, #5f27cd);"></div>
+                    <!-- 初始宽度改为70% 与 characterState 同步 -->
+                    <div class="status-bar-fill" id="trustBar" style="width: 70%; background: linear-gradient(90deg, #54a0ff, #5f27cd);"></div>
                 </div>
-                <span class="status-value" id="trustValue">50%</span>
-            </div>
-            <!-- 新增模型显示，点击可快速打开设置 -->
-            <div class="status-item" id="modelDisplayItem" style="cursor: pointer; min-width: 100px;" title="点击切换模型">
-                <span class="status-icon">🤖</span>
-                <span class="status-label">当前模型</span>
-                <div class="model-display" id="currentModelDisplay">加载中…</div>
+                <span class="status-value" id="trustValue">70%</span>
             </div>
         </div>
 
@@ -334,24 +314,100 @@
 - 在{{user}}不在或没看向你时，不能描写你的状态或动作
 - 要在不经意间露出一丝丝微不可查的漏洞细节，但绝不能主动解释，让{{user}}自己猜`;
 
-        // ========== 沈招娣的开场白（不变） ==========
+        // ========== 沈招娣的开场白 ==========
         const OPENING_LINES = [
             { 
                 emoji: '🏮', 
                 short: '七夕夜，柳树下...',
-                full: `七夕的夜风是温的，带着江水潮湿的氤氲和岸边青草的气味。河面上，数不清的莲花灯、兔子灯、鲤鱼灯随着水波微微起伏，烛火连成一片晃动的星河，将江水映得流光溢彩。\n\n沈招娣就站在这片人间星河岸边的老柳树下。\n\n她穿了一件新裁的月白衫子，棉布的质地柔软地贴着她清瘦的身体轮廓，高高的领子一丝不苟地扣好，护住了纤细的脖颈。宽大的袖口垂至手腕，遮住了那道浅淡的疤痕。出门前，她对着镜子，笨拙地用金线在袖口绣了一对并蒂莲，针脚细密，是她能想到的、最美好的祝愿。\n\n她站得很直，背脊挺得像一根紧绷的弦，目光却贪婪地在往来的人群中搜索着那个熟悉的身影。每当有相似的背影出现，她的心跳就会漏掉一拍，随即又在看清面容后沉寂下去。\n\n呼吸之间，鼻腔里似乎还残留着衣柜里樟木混合着布料的气息。\n\n就在几个小时前，她将那件大红色的真丝旗袍从箱底取出，用蒸汽熨斗一遍遍烫平了所有褶皱。那红色刺得她眼睛发痛，像血，也像最热烈的火。她将它挂在衣柜最显眼的位置，柜门虚掩着。这是她给自己准备的最后一条路。如果今晚他摇头，如果他眼中有哪怕一丁点的嫌恶，那么明天，这片江水将是她最后的归宿。她会穿上这身最夺目的红，像一朵开到极致后决然凋零的花，沉入水底，至少，能留住一个好看的、完整的幻影。\n\n这个念头让她获得了一种诡异的平静。\n\n就在这时，人群中一抹暖黄的光由远及近。\n\n是{{User}}。\n\n他手里提着一盏精致的荷花灯，薄如蝉翼的纱质花瓣层层叠叠，中央的烛火将他的脸庞笼罩在一圈柔和的光晕里，眉眼显得比记忆中任何一次都要温柔。他穿过喧闹的人群，径直向她走来，身后浮光掠精的江景都成了模糊的背景。\n\n沈招娣的心脏在那一刻停止了所有的预演和挣扎，只是剧烈地、不受控制地跳动起来，血液冲上脸颊，让她感到一阵晕眩的灼热。\n\n“给。”{{User}}在她面前站定，将手中的荷花灯递了过来，灯上细细的红绳随着他的动作轻轻晃动。\n\n烛光下，他清澈的眼睛里倒映着她小小的、穿着月白衫子的身影。\n\n沈招娣垂下眼帘，不敢与他对视。她慢慢伸出手，指尖在即将触碰到那根红绳时，无法克制地颤抖了一下。她深吸一口气，那口气息带着江水的凉意，却奇异地稳住了她的心神。\n\n她接过了灯，终于鼓足全部的勇气，抬起头，望进了{{User}}的眼睛里，准备说出那句已经排练了千百遍的开场白。`
+                full: `七夕的夜风是温的，带着江水潮湿的氤氲和岸边青草的气味。河面上，数不清的莲花灯、兔子灯、鲤鱼灯随着水波微微起伏，烛火连成一片晃动的星河，将江水映得流光溢彩。
+
+沈招娣就站在这片人间星河岸边的老柳树下。
+
+她穿了一件新裁的月白衫子，棉布的质地柔软地贴着她清瘦的身体轮廓，高高的领子一丝不苟地扣好，护住了纤细的脖颈。宽大的袖口垂至手腕，遮住了那道浅淡的疤痕。出门前，她对着镜子，笨拙地用金线在袖口绣了一对并蒂莲，针脚细密，是她能想到的、最美好的祝愿。
+
+她站得很直，背脊挺得像一根紧绷的弦，目光却贪婪地在往来的人群中搜索着那个熟悉的身影。每当有相似的背影出现，她的心跳就会漏掉一拍，随即又在看清面容后沉寂下去。
+
+呼吸之间，鼻腔里似乎还残留着衣柜里樟木混合着布料的气息。
+
+就在几个小时前，她将那件大红色的真丝旗袍从箱底取出，用蒸汽熨斗一遍遍烫平了所有褶皱。那红色刺得她眼睛发痛，像血，也像最热烈的火。她将它挂在衣柜最显眼的位置，柜门虚掩着。这是她给自己准备的最后一条路。如果今晚他摇头，如果他眼中有哪怕一丁点的嫌恶，那么明天，这片江水将是她最后的归宿。她会穿上这身最夺目的红，像一朵开到极致后决然凋零的花，沉入水底，至少，能留住一个好看的、完整的幻影。
+
+这个念头让她获得了一种诡异的平静。
+
+就在这时，人群中一抹暖黄的光由远及近。
+
+是{{User}}。
+
+他手里提着一盏精致的荷花灯，薄如蝉翼的纱质花瓣层层叠叠，中央的烛火将他的脸庞笼罩在一圈柔和的光晕里，眉眼显得比记忆中任何一次都要温柔。他穿过喧闹的人群，径直向她走来，身后浮光掠精的江景都成了模糊的背景。
+
+沈招娣的心脏在那一刻停止了所有的预演和挣扎，只是剧烈地、不受控制地跳动起来，血液冲上脸颊，让她感到一阵晕眩的灼热。
+
+“给。”{{User}}在她面前站定，将手中的荷花灯递了过来，灯上细细的红绳随着他的动作轻轻晃动。
+
+烛光下，他清澈的眼睛里倒映着她小小的、穿着月白衫子的身影。
+
+沈招娣垂下眼帘，不敢与他对视。她慢慢伸出手，指尖在即将触碰到那根红绳时，无法克制地颤抖了一下。她深吸一口气，那口气息带着江水的凉意，却奇异地稳住了她的心神。
+
+她接过了灯，终于鼓足全部的勇气，抬起头，望进了{{User}}的眼睛里，准备说出那句已经排练了千百遍的开场白。`
             },
             { 
                 emoji: '💌', 
                 short: '河灯下的告白...',
-                full: `河灯顺着墨色的江水流淌，烛火在水面上碎成一片摇曳的粼光。\n\n{{User}}提着一盏荷花灯，穿过熙攘的人群，一眼就看到了桥边亭下的那个身影。沈招娣穿了一件新裁的月白衫子，袖口上用淡青色的线绣着两朵并蒂莲，针脚细密得像是融进了布料里。她安静地站在那儿，像一株在夜色里悄然绽放的玉簪花。\n\n看到{{User}}走近，她的眼睛亮了起来，那光亮比江面上的烛火还要暖人。\n\n“你来了。”她的声音很轻，带着一点不易察觉的、像是雀跃的颤音。\n\n{{User}}将手中的荷花灯递过去，灯里的烛火映得他眉眼愈发温和。\n\n这一年半的时光，像是被这江南的烟雨浸润过，慢得不急不躁，却又在不经意间流淌了很远。\n\n最初的相遇，也是在这样一个雨天。雨巷深处的长椅冰凉，她一个人坐在那里，香烟被雨水打湿，安静地熄灭在指间。{{User}}路过时，只是将手里多余的一柄青布伞递了过去，说了句“多的，送你了”，便转身没入了街角的雨雾里。\n\n他原以为这只是一桩微不足道的善意，很快就淡忘了。直到一个月后，又是梅雨季，青石板路被洗得泛出水光。他再次走那条旧路，却看见她坐在那张长椅上，身边放着一个伞筒，里面插着那柄眼熟的青布伞。\n\n当{{User}}的身影再次从雾霭里浮现时，她站了起来，特意抚平了裙子上的褶皱，高领的棉衫严严实实地裹到锁骨。\n\n“伞，还你。”\n\n在他伸手接过伞柄时，指尖不小心触碰到了她的。她的手很凉，触碰的那一瞬猛地缩了回去，整个人都绷紧了，他不留痕迹的看了一眼这怪异的举动。\n\n加上微信后，他们的交流变得细水长流。她很少说话，却很会“看”。每天晚上，{{Users}}手机都会安静地亮起，收到她发来的照片。有时是街角墙缝里钻出的一朵不知名的小野花，有时是躲在屋檐下、揣着爪子打盹的流浪猫。都是些干净的、不惹尘埃的东西。{{User}}回得不算快，但总会回。有时是一张深夜拍下的星空，有时只是简单的一句叮嘱：“雨大，记得关窗。”\n\n后来，到了六月槐花开得满城都香的时候，她第一次鼓起勇气，约他去逛旧书市。在一个拥挤的摊位前，白发苍苍的摊主笑呵呵地打趣他们是“一对璧人”，她顿时慌了手脚，转身时撞翻了旁边一摞高高堆起的旧书。纸页纷飞，她窘得脸颊通红，连声道歉。{{User}}却什么也没说，只是自然地蹲下身，慢条斯理地帮她一本本捡起来。就在他捡起最后一本书时，他的袖口无意间擦过了她的手腕。\n\n{{User}}注意到她像是被针扎了似的，急急地将袖子往下扯了扯，盖住了那一片皮肤。他没有多问，只是站起身，指了指街对面的那家糖水铺，温声问：“那家铺子，要不要试试？”\n\n光阴就像那碗糖水铺里熬得绵软的红豆沙，无声无息地就过去了半年。他发现她身上总带着一种清浅的橘子香，很干净的味道。偶尔不经意地碰到她，能感觉到她身体瞬间的僵硬，但会马上变成一种更加小心翼翼的平静。有一次去看老电影，影院里的冷气开得太足，他便将自己的外套递给了她。她接过去，只是抱着，整整三个小时，一动不动地抱在怀里，像捧着什么稀世珍宝。电影散场后她将外套还回来时，上面还留着她的体温，和他自己身上那股阳光晒过棉布的味道混在一起。\n\n小年夜那天，{{User}}写了春联，给她送去。开门时，他见她脸色不太好，脸颊泛着不正常的红晕。他下意识地伸出手，想探一探她的额头，看是不是发烧了。\n\n他的手还没碰到她，她却像是受了巨大的惊吓，猛地向后退去，后背重重地撞在门框上，发出一声闷响。她下意识地脱口而出：“别，脏。”\n\n那两个字很轻，却让空气瞬间凝固了。她说完立刻就后悔了，咬着嘴唇，低下了头，不敢看他，攥着衣角的手指用力到指节都有些发白。\n\n{{User}}愣住了，然后缓缓收回了悬在半空的手。他没有追问那句话的意思，只是看着她微颤的睫毛，放柔了声音：“发烧了就别站着，进去休息吧。”\n\n又一个半年过去，入了夏，芒种时节的雨水总是来得又急又大。有段时间，{{User}}明显感觉到她整个人都松快了许多，眉眼间那层挥之不去的、淡淡的愁绪也消散了不少。她轻描淡写地提了一句，说辞掉了之前那份很累人的工作，语气里是藏不住的解脱和轻快。\n\n而今夜，是七夕。\n\n她站在亭下，看着{{User}}，看着他递过来的那盏温暖的荷花灯，终于鼓起了全部的勇气。\n\n“{{User}}，”她接过灯，指尖小心翼翼地避开了他的手，然后抬起头，那双浸着水光的黑眸认真地望着他，“我，我有话想对你说。”\n\n她的声音依旧很轻，却带着一种前所未有的郑重，像是要将自己的整个灵魂都剖开来，捧给他看。江风拂过，吹动了她鬓角的碎发，也吹动了那盏荷花灯里微弱却坚定的烛火。\n\n“我喜欢你，{{user}}！”`
+                full: `河灯顺着墨色的江水流淌，烛火在水面上碎成一片摇曳的粼光。
+
+{{User}}提着一盏荷花灯，穿过熙攘的人群，一眼就看到了桥边亭下的那个身影。沈招娣穿了一件新裁的月白衫子，袖口上用淡青色的线绣着两朵并蒂莲，针脚细密得像是融进了布料里。她安静地站在那儿，像一株在夜色里悄然绽放的玉簪花。
+
+看到{{User}}走近，她的眼睛亮了起来，那光亮比江面上的烛火还要暖人。
+
+“你来了。”她的声音很轻，带着一点不易察觉的、像是雀跃的颤音。
+
+{{User}}将手中的荷花灯递过去，灯里的烛火映得他眉眼愈发温和。
+
+这一年半的时光，像是被这江南的烟雨浸润过，慢得不急不躁，却又在不经意间流淌了很远。
+
+最初的相遇，也是在这样一个雨天。雨巷深处的长椅冰凉，她一个人坐在那里，香烟被雨水打湿，安静地熄灭在指间。{{User}}路过时，只是将手里多余的一柄青布伞递了过去，说了句“多的，送你了”，便转身没入了街角的雨雾里。
+
+他原以为这只是一桩微不足道的善意，很快就淡忘了。直到一个月后，又是梅雨季，青石板路被洗得泛出水光。他再次走那条旧路，却看见她坐在那张长椅上，身边放着一个伞筒，里面插着那柄眼熟的青布伞。
+
+当{{User}}的身影再次从雾霭里浮现时，她站了起来，特意抚平了裙子上的褶皱，高领的棉衫严严实实地裹到锁骨。
+
+“伞，还你。”
+
+在他伸手接过伞柄时，指尖不小心触碰到了她的。她的手很凉，触碰的那一瞬猛地缩了回去，整个人都绷紧了，他不留痕迹的看了一眼这怪异的举动。
+
+加上微信后，他们的交流变得细水长流。她很少说话，却很会“看”。每天晚上，{{Users}}手机都会安静地亮起，收到她发来的照片。有时是街角墙缝里钻出的一朵不知名的小野花，有时是躲在屋檐下、揣着爪子打盹的流浪猫。都是些干净的、不惹尘埃的东西。{{User}}回得不算快，但总会回。有时是一张深夜拍下的星空，有时只是简单的一句叮嘱：“雨大，记得关窗。”
+
+后来，到了六月槐花开得满城都香的时候，她第一次鼓起勇气，约他去逛旧书市。在一个拥挤的摊位前，白发苍苍的摊主笑呵呵地打趣他们是“一对璧人”，她顿时慌了手脚，转身时撞翻了旁边一摞高高堆起的旧书。纸页纷飞，她窘得脸颊通红，连声道歉。{{User}}却什么也没说，只是自然地蹲下身，慢条斯理地帮她一本本捡起来。就在他捡起最后一本书时，他的袖口无意间擦过了她的手腕。
+
+{{User}}注意到她像是被针扎了似的，急急地将袖子往下扯了扯，盖住了那一片皮肤。他没有多问，只是站起身，指了指街对面的那家糖水铺，温声问：“那家铺子，要不要试试？”
+
+光阴就像那碗糖水铺里熬得绵软的红豆沙，无声无息地就过去了半年。他发现她身上总带着一种清浅的橘子香，很干净的味道。偶尔不经意地碰到她，能感觉到她身体瞬间的僵硬，但会马上变成一种更加小心翼翼的平静。有一次去看老电影，影院里的冷气开得太足，他便将自己的外套递给了她。她接过去，只是抱着，整整三个小时，一动不动地抱在怀里，像捧着什么稀世珍宝。电影散场后她将外套还回来时，上面还留着她的体温，和他自己身上那股阳光晒过棉布的味道混在一起。
+
+小年夜那天，{{User}}写了春联，给她送去。开门时，他见她脸色不太好，脸颊泛着不正常的红晕。他下意识地伸出手，想探一探她的额头，看是不是发烧了。
+
+他的手还没碰到她，她却像是受了巨大的惊吓，猛地向后退去，后背重重地撞在门框上，发出一声闷响。她下意识地脱口而出：“别，脏。”
+
+那两个字很轻，却让空气瞬间凝固了。她说完立刻就后悔了，咬着嘴唇，低下了头，不敢看他，攥着衣角的手指用力到指节都有些发白。
+
+{{User}}愣住了，然后缓缓收回了悬在半空的手。他没有追问那句话的意思，只是看着她微颤的睫毛，放柔了声音：“发烧了就别站着，进去休息吧。”
+
+又一个半年过去，入了夏，芒种时节的雨水总是来得又急又大。有段时间，{{User}}明显感觉到她整个人都松快了许多，眉眼间那层挥之不去的、淡淡的愁绪也消散了不少。她轻描淡写地提了一句，说辞掉了之前那份很累人的工作，语气里是藏不住的解脱和轻快。
+
+而今夜，是七夕。
+
+她站在亭下，看着{{User}}，看着他递过来的那盏温暖的荷花灯，终于鼓起了全部的勇气。
+
+“{{User}}，”她接过灯，指尖小心翼翼地避开了他的手，然后抬起头，那双浸着水光的黑眸认真地望着他，“我，我有话想对你说。”
+
+她的声音依旧很轻，却带着一种前所未有的郑重，像是要将自己的整个灵魂都剖开来，捧给他看。江风拂过，吹动了她鬓角的碎发，也吹动了那盏荷花灯里微弱却坚定的烛火。
+
+“我喜欢你，{{user}}！”`
             }
         ];
 
         // ========== 长期记忆相关常量 ==========
-        const SUMMARY_INTERVAL = 40;
-        let conversationSummary = '';
-        let lastSummaryIndex = 0;
+        const SUMMARY_INTERVAL = 40; // 每40条消息总结一次
+        let conversationSummary = '';  // 存储当前摘要
+        let lastSummaryIndex = 0;      // 上次总结时的消息总数
 
         // ========== 获取页面元素 ==========
         const settingsBtn = document.getElementById('settingsBtn');
@@ -364,17 +420,11 @@
         const apiModelInput = document.getElementById('apiModel');
         const userNameInput = document.getElementById('userName');
         
-        // 新增元素
-        const testConnectionBtn = document.getElementById('testConnectionBtn');
-        const connectionResult = document.getElementById('connectionResult');
-        const currentModelDisplay = document.getElementById('currentModelDisplay');
-        const modelDisplayItem = document.getElementById('modelDisplayItem');
-        
-        // ========== 角色状态 ==========
+        // ========== 角色状态 (好感初始70) ==========
         let characterState = {
             health: 60,
             mood: 70,
-            trust: 50
+            trust: 70      // 从50改为70
         };
 
         function updateStatusBars() {
@@ -388,6 +438,7 @@
 
         function updateStateBasedOnMessage(text, sender) {
             const lowerText = text.toLowerCase();
+            
             if (sender === 'user') {
                 if (lowerText.includes('关心') || lowerText.includes('照顾') || lowerText.includes('陪你') || lowerText.includes('不怕')) {
                     characterState.trust = Math.min(100, characterState.trust + 2);
@@ -398,14 +449,18 @@
                     characterState.mood = Math.max(0, characterState.mood - 5);
                 }
             }
+            
             if (lowerText.includes('过去') || lowerText.includes('以前') || lowerText.includes('仓库') || lowerText.includes('王富贵')) {
                 characterState.mood = Math.max(0, characterState.mood - 3);
                 characterState.health = Math.max(0, characterState.health - 1);
             }
+            
             characterState.health = Math.max(0, characterState.health - 0.2);
+            
             characterState.health = Math.min(100, Math.max(0, characterState.health));
             characterState.mood = Math.min(100, Math.max(0, characterState.mood));
             characterState.trust = Math.min(100, Math.max(0, characterState.trust));
+            
             updateStatusBars();
         }
         
@@ -414,19 +469,12 @@
             settingsPanel.classList.toggle('show');
         });
         
-        // ========== 预设模型填充 + 增强快速切换 ==========
+        // ========== 预设模型填充 ==========
         document.querySelectorAll('.model-preset').forEach(preset => {
             preset.addEventListener('click', () => {
                 apiUrlInput.value = preset.dataset.url;
                 apiModelInput.value = preset.dataset.model;
-                // 如果密钥已填写，自动保存并更新模型显示；否则提示
-                if (apiKeyInput.value.trim() !== '') {
-                    saveSettings();  // 保存并关闭面板，更新显示
-                } else {
-                    // 只填充，提示用户填写密钥
-                    connectionResult.innerText = '📋 已填充模型，请填写API密钥后保存';
-                    connectionResult.style.color = '#fbbf24';
-                }
+                alert(`已填充 ${preset.textContent} 配置，记得填密钥`);
             });
         });
         
@@ -444,9 +492,8 @@
             } else {
                 userNameInput.value = '用户';
             }
-            // 更新模型显示
-            updateModelDisplay();
 
+            // 加载摘要和索引
             const savedSummary = localStorage.getItem('conversationSummary');
             if (savedSummary) {
                 conversationSummary = savedSummary;
@@ -454,16 +501,6 @@
             const savedIndex = localStorage.getItem('lastSummaryIndex');
             if (savedIndex) {
                 lastSummaryIndex = parseInt(savedIndex, 10);
-            }
-        }
-        
-        // ========== 更新模型显示 ==========
-        function updateModelDisplay() {
-            const config = getCurrentConfig();
-            if (config && config.model) {
-                currentModelDisplay.innerText = config.model;
-            } else {
-                currentModelDisplay.innerText = '未设置';
             }
         }
         
@@ -482,7 +519,6 @@
             }
             
             localStorage.setItem('apiSettings', JSON.stringify(config));
-            updateModelDisplay();  // 更新显示
             updateWelcomeMessage();
             settingsPanel.classList.remove('show');
             alert('配置已保存！');
@@ -490,65 +526,16 @@
         
         document.getElementById('saveSettings').addEventListener('click', saveSettings);
         
-        // ========== 测试连接功能 ==========
-        async function testConnection() {
-            const url = apiUrlInput.value.trim();
-            const key = apiKeyInput.value.trim();
-            const model = apiModelInput.value.trim();
-            
-            if (!url || !key || !model) {
-                connectionResult.innerText = '❌ 请完整填写API地址、密钥和模型';
-                connectionResult.style.color = '#f87171';
-                return;
-            }
-            
-            connectionResult.innerText = '⏳ 测试中...';
-            connectionResult.style.color = '#ccc';
-            
-            try {
-                // 发送一个极简的请求，仅用于验证
-                const testBody = {
-                    model: model,
-                    messages: [{ role: 'user', content: 'ping' }],
-                    max_tokens: 2,
-                    temperature: 0.1
-                };
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${key}`
-                    },
-                    body: JSON.stringify(testBody)
-                });
-                
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${errText.substring(0, 80)}`);
-                }
-                
-                const data = await response.json();
-                // 简单校验是否有choices字段
-                if (data.choices && data.choices.length > 0) {
-                    connectionResult.innerText = '✅ 连接成功！API密钥有效，模型可用。';
-                    connectionResult.style.color = '#4ade80';
-                } else {
-                    connectionResult.innerText = '⚠️ 响应格式异常，但可能成功，请尝试发送消息。';
-                    connectionResult.style.color = '#fbbf24';
-                }
-            } catch (error) {
-                connectionResult.innerText = `❌ 连接失败：${error.message}`;
-                connectionResult.style.color = '#f87171';
-            }
+        // ========== 获取当前配置 ==========
+        function getCurrentConfig() {
+            const settings = localStorage.getItem('apiSettings');
+            return settings ? JSON.parse(settings) : null;
         }
         
-        testConnectionBtn.addEventListener('click', testConnection);
-        
-        // ========== 点击模型显示快速打开设置 ==========
-        modelDisplayItem.addEventListener('click', () => {
-            settingsPanel.classList.add('show');
-        });
+        function getCurrentUserName() {
+            const config = getCurrentConfig();
+            return config?.userName || '用户';
+        }
         
         // ========== 聊天历史 ==========
         let conversationHistory = [];
@@ -655,6 +642,8 @@
             chatArea.scrollTop = chatArea.scrollHeight;
 
             updateStateBasedOnMessage(content, sender);
+
+            // 检查是否需要生成摘要
             checkAndSummarize();
         }
         
@@ -693,6 +682,7 @@
             chatArea.appendChild(container);
         }
         
+        // ========== 选择开场白 ==========
         function selectOpening(index) {
             const line = OPENING_LINES[index];
             const userName = getCurrentUserName();
@@ -725,6 +715,7 @@
             
             try {
                 const userName = getCurrentUserName();
+                // 如果有摘要，将其附加到系统提示中
                 let systemPromptWithSummary = YOUR_SYSTEM_PROMPT;
                 if (conversationSummary) {
                     systemPromptWithSummary += `\n\n【以下是之前的对话摘要】\n${conversationSummary}`;
@@ -733,7 +724,7 @@
                 
                 const messagesForAPI = [
                     { role: 'system', content: systemPromptWithSummary },
-                    ...conversationHistory.slice(-10)
+                    ...conversationHistory.slice(-10)  // 最近10条消息保持细节
                 ];
                 
                 const response = await fetch(config.url, {
@@ -783,6 +774,7 @@
         // ========== 自动总结功能 ==========
         async function checkAndSummarize() {
             const totalMessages = conversationHistory.length;
+            // 当消息总数达到SUMMARY_INTERVAL的倍数，且自上次总结后新增了至少SUMMARY_INTERVAL条时触发
             if (totalMessages >= SUMMARY_INTERVAL && (totalMessages - lastSummaryIndex) >= SUMMARY_INTERVAL) {
                 await generateSummary();
             }
@@ -790,19 +782,22 @@
 
         async function generateSummary() {
             const config = getCurrentConfig();
-            if (!config || !config.key) return;
+            if (!config || !config.key) return; // 没有API密钥不总结
 
             const totalMessages = conversationHistory.length;
+            // 选择要总结的消息范围：从 lastSummaryIndex 到当前所有消息
             const startIdx = lastSummaryIndex;
             const endIdx = totalMessages;
             const messagesToSummarize = conversationHistory.slice(startIdx, endIdx);
 
+            // 构建总结用的消息文本
             let conversationText = '';
             messagesToSummarize.forEach(msg => {
                 const speaker = msg.role === 'user' ? '用户' : 'AI';
                 conversationText += `${speaker}: ${msg.content}\n`;
             });
 
+            // 构造总结请求的prompt
             let summaryPrompt = '';
             if (conversationSummary) {
                 summaryPrompt = `现有摘要：\n${conversationSummary}\n\n新增对话：\n${conversationText}\n\n请整合以上信息，生成一个新的摘要，保留所有重要内容，包括角色状态、情感变化、关键事件等。用简洁的中文。`;
@@ -845,24 +840,123 @@
                 }
 
                 conversationSummary = newSummary;
-                lastSummaryIndex = totalMessages;
+                lastSummaryIndex = totalMessages; // 更新为当前消息总数
                 localStorage.setItem('conversationSummary', conversationSummary);
                 localStorage.setItem('lastSummaryIndex', lastSummaryIndex);
-                console.log('摘要已更新');
+                console.log('摘要已更新:', conversationSummary);
             } catch (error) {
                 console.error('生成摘要时出错:', error);
             }
         }
-        
-        function getCurrentConfig() {
-            const settings = localStorage.getItem('apiSettings');
-            return settings ? JSON.parse(settings) : null;
+
+        // ========== 新增：从API获取模型列表 ==========
+        const fetchModelsBtn = document.getElementById('fetchModelsBtn');
+        const modelSelectContainer = document.getElementById('modelSelectContainer');
+        const modelSelect = document.getElementById('modelSelect');
+        const modelFetchError = document.getElementById('modelFetchError');
+
+        // 生成候选模型列表URL (启发式)
+        function getCandidateModelUrls(baseUrl) {
+            const candidates = [];
+            try {
+                const url = new URL(baseUrl);
+                let path = url.pathname;
+                // 如果路径以 /chat/completions 结尾，尝试替换为 /models
+                if (path.endsWith('/chat/completions')) {
+                    candidates.push(url.origin + path.replace(/\/chat\/completions$/, '/models'));
+                    candidates.push(url.origin + path.replace(/\/chat\/completions$/, '/v1/models')); 
+                } else if (path.endsWith('/completions')) {
+                    candidates.push(url.origin + path.replace(/\/completions$/, '/models'));
+                    candidates.push(url.origin + path.replace(/\/completions$/, '/v1/models'));
+                } else {
+                    // 默认尝试加上 /models 和 /v1/models
+                    candidates.push(url.origin + (path.endsWith('/') ? path + 'models' : path + '/models'));
+                    candidates.push(url.origin + (path.endsWith('/') ? path + 'v1/models' : path + '/v1/models'));
+                }
+                // 最后尝试用origin直接+v1/models
+                candidates.push(url.origin + '/v1/models');
+            } catch (e) {
+                // URL解析失败，直接返回空
+            }
+            return candidates;
         }
-        
-        function getCurrentUserName() {
-            const config = getCurrentConfig();
-            return config?.userName || '用户';
+
+        async function fetchModelList() {
+            const apiUrl = apiUrlInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            
+            if (!apiUrl || !apiKey) {
+                modelFetchError.innerText = '请先填写API地址和密钥';
+                return;
+            }
+
+            // 显示下拉容器，显示加载中
+            modelSelectContainer.style.display = 'block';
+            modelSelect.innerHTML = '<option value="">⏳ 正在获取模型列表…</option>';
+            modelFetchError.innerText = '';
+
+            const candidateUrls = getCandidateModelUrls(apiUrl);
+            if (candidateUrls.length === 0) {
+                modelFetchError.innerText = '无法解析API地址，请手动输入模型名称';
+                return;
+            }
+
+            let lastError = null;
+            for (const modelsUrl of candidateUrls) {
+                try {
+                    const response = await fetch(modelsUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        lastError = `HTTP ${response.status}`;
+                        continue; // 尝试下一个候选
+                    }
+                    
+                    const data = await response.json();
+                    // 尝试解析模型列表 (兼容 openai 格式: { data: [ { id: '...' } ] } )
+                    let models = [];
+                    if (data.data && Array.isArray(data.data)) {
+                        models = data.data.map(item => item.id).filter(id => id);
+                    } else if (Array.isArray(data)) {
+                        models = data.map(item => item.id || item).filter(id => id);
+                    } else if (data.models && Array.isArray(data.models)) {
+                        models = data.models.map(m => m.id || m);
+                    }
+                    
+                    if (models.length === 0) {
+                        lastError = '未找到模型列表';
+                        continue;
+                    }
+                    
+                    // 成功，填充下拉
+                    modelSelect.innerHTML = '<option value="">请选择模型</option>' + 
+                        models.map(m => `<option value="${m}">${m}</option>`).join('');
+                    
+                    // 监听选择事件
+                    modelSelect.onchange = () => {
+                        if (modelSelect.value) {
+                            apiModelInput.value = modelSelect.value;
+                        }
+                    };
+                    
+                    modelFetchError.innerText = ''; // 清除错误
+                    return; // 成功退出
+                    
+                } catch (err) {
+                    lastError = err.message;
+                }
+            }
+            
+            // 所有候选都失败
+            modelSelect.innerHTML = '<option value="">❌ 获取失败</option>';
+            modelFetchError.innerText = `获取模型列表失败: ${lastError || '未知错误'}`;
         }
+
+        fetchModelsBtn.addEventListener('click', fetchModelList);
         
         // ========== 初始化 ==========
         function init() {
@@ -870,7 +964,6 @@
             loadChatHistory();
             displayHistory();
             updateStatusBars();
-            updateModelDisplay();
         }
         
         init();
